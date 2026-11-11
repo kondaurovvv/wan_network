@@ -1,0 +1,162 @@
+
+!
+! Last configuration change at 03:26:20 UTC Wed Nov 11 2026
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname R28
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 5 $1$Pj1/$o6hhzXXk/mpzQx9SZrpER/
+!
+no aaa new-model
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+ipv6 unicast-routing
+ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback28
+ no shutdown
+ description "MANAGEMENT LOOPBACK"
+ ip address 10.255.2.2 255.255.255.255
+ ipv6 address 200A:A:3:FFFF::28/128
+!
+interface Ethernet0/0
+ no shutdown
+ description "R28 to R26"
+ ip address 133.133.133.14 255.255.255.252
+ ipv6 address FE80::8 link-local
+ ipv6 address 2003:3:3:4::2/64
+ ipv6 enable
+!
+interface Ethernet0/1
+ no shutdown
+ description "R28 to R29"
+ ip address 133.133.133.10 255.255.255.252
+ ipv6 address FE80::8 link-local
+ ipv6 address 2003:3:3:3::2/64
+ ipv6 enable
+!
+interface Ethernet0/2
+ no shutdown
+ description "TRUNK to SW29"
+ no ip address
+!
+interface Ethernet0/2.7
+ no shutdown
+ description "R28 to SW29"
+ encapsulation dot1Q 7
+ ip address 172.16.7.1 255.255.255.0
+ ipv6 address FE80::8 link-local
+ ipv6 address 200A:A:3:7::1/64
+!
+interface Ethernet0/2.97
+ no shutdown
+ description "R28 to SW29"
+ encapsulation dot1Q 97
+ ip address 172.16.97.1 255.255.255.0
+ ipv6 address FE80::8 link-local
+ ipv6 address 200A:A:3:97::1/64
+!
+interface Ethernet0/3
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet1/0
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet1/1
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet1/2
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet1/3
+ no shutdown
+ no ip address
+ shutdown
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+banner motd R28
+!
+line con 0
+ exec-timeout 15 0
+ password 7 1511021F0725
+ logging synchronous
+ login
+line aux 0
+line vty 0 4
+ exec-timeout 15 0
+ password 7 111B160A03
+ logging synchronous
+ login
+ transport input ssh
+!
+!
+end

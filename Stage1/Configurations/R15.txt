@@ -1,0 +1,131 @@
+
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname R15
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 5 $1$I4D2$yuEOEftVe.XjSw0Dw1h7f1
+!
+no aaa new-model
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+ipv6 unicast-routing
+ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback15
+ no shutdown
+ description "Management Interface"
+ ip address 10.255.4.2 255.255.255.255
+ ipv6 address 200A:A:1:FFFF::15/128
+!
+interface Ethernet0/0
+ no shutdown
+ description "R15 to R13"
+ ip address 10.10.12.13 255.255.255.252
+ ipv6 address FE80::14 link-local
+ ipv6 address 200A:A:1:4::1/64
+ ipv6 enable
+!
+interface Ethernet0/1
+ no shutdown
+ description "R15 to R12"
+ ip address 10.10.12.17 255.255.255.252
+ ipv6 address FE80::14 link-local
+ ipv6 address 200A:A:1:5::1/64
+ ipv6 enable
+!
+interface Ethernet0/2
+ no shutdown
+ description "R15 to R21"
+ ip address 122.122.122.2 255.255.255.252
+ ipv6 address FE80::14 link-local
+ ipv6 address 2002:2:2:1::2/64
+ ipv6 enable
+!
+interface Ethernet0/3
+ no shutdown
+ description "R15 to R20"
+ ip address 10.10.12.21 255.255.255.252
+ ipv6 address FE80::14 link-local
+ ipv6 address 200A:A:1:6::1/64
+ ipv6 enable
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+banner motd R15
+!
+line con 0
+ exec-timeout 15 0
+ password 7 00071A150754
+ logging synchronous
+ login
+line aux 0
+line vty 0 4
+ exec-timeout 15 0
+ password 7 0101090B4F
+ logging synchronous
+ login
+ transport input ssh
+!
+!
+end

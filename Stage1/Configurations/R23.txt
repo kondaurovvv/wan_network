@@ -1,0 +1,142 @@
+
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname R23
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 5 $1$q2k7$SvZwk5spVgJmBy4k79jTA/
+!
+no aaa new-model
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+ipv6 unicast-routing
+ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Ethernet0/0
+ no shutdown
+ description "R23 to R22"
+ ip address 111.111.111.10 255.255.255.252
+ ipv6 address FE80::3 link-local
+ ipv6 address 2001:1:1:3::2/64
+ ipv6 enable
+!
+interface Ethernet0/1
+ no shutdown
+ description "R23 to R25"
+ ip address 10.10.10.1 255.255.255.252
+ ipv6 address FE80::3 link-local
+ ipv6 address 2003:3:3:123::1/64
+ ipv6 enable
+!
+interface Ethernet0/2
+ no shutdown
+ description "R23 to R24"
+ ip address 10.10.10.5 255.255.255.252
+ ipv6 address FE80::3 link-local
+ ipv6 address 2003:3:3:124::1/64
+ ipv6 enable
+!
+interface Ethernet0/3
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet1/0
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet1/1
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet1/2
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet1/3
+ no shutdown
+ no ip address
+ shutdown
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+banner motd R23
+!
+line con 0
+ exec-timeout 15 0
+ password 7 070C285F4D06
+ logging synchronous
+ login
+line aux 0
+line vty 0 4
+ exec-timeout 15 0
+ password 7 044904091B
+ logging synchronous
+ login
+ transport input ssh
+!
+!
+end

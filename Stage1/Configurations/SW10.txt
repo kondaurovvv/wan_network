@@ -1,0 +1,169 @@
+
+!
+! Last configuration change at 01:40:01 UTC Wed Nov 11 2026
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+service compress-config
+!
+hostname SW10
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 5 $1$hn9R$eJItNbAtVKJEgGBg9Y3Dg/
+!
+no aaa new-model
+!
+!
+!
+!
+!
+vtp mode off
+!
+!
+!
+no ip domain-lookup
+ip cef
+no ipv6 cef
+!
+!
+!
+spanning-tree mode mst
+spanning-tree extend system-id
+!
+spanning-tree mst configuration
+ name PETERSBURG
+ revision 1
+ instance 1 vlan 8
+ instance 2 vlan 9, 98
+!
+spanning-tree mst 0-1 priority 8192
+spanning-tree mst 2 priority 4096
+!
+vlan internal allocation policy ascending
+!
+vlan 8
+ name office8
+!
+vlan 9
+ name office9
+!
+vlan 98
+ name Management
+no cdp run
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback10
+ no shutdown
+ description "Managment SW10"
+ ip address 10.255.3.6 255.255.255.255
+ ipv6 address 200A:A:2:FFFF::10/128
+!
+interface Port-channel1
+ no shutdown
+ description "LACP to SW9"
+ switchport trunk allowed vlan 8,9,98
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface Ethernet0/0
+ no shutdown
+ description "SW10 to SW9 LACP"
+ switchport trunk allowed vlan 8,9,98
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 1 mode active
+!
+interface Ethernet0/1
+ no shutdown
+ description "SW10 to SW9 LACP"
+ switchport trunk allowed vlan 8,9,98
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 1 mode active
+!
+interface Ethernet0/2
+ no shutdown
+ description "SW10 to VPC"
+ switchport access vlan 9
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface Ethernet0/3
+ no shutdown
+ description "SW10 to R16"
+ switchport trunk allowed vlan 9
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface Ethernet1/0
+ no shutdown
+ description "SW10 to R17"
+ switchport trunk allowed vlan 9
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface Ethernet1/1
+ no shutdown
+!
+interface Ethernet1/2
+ no shutdown
+!
+interface Ethernet1/3
+ no shutdown
+!
+interface Vlan98
+ no shutdown
+ description "Management SW10"
+ ip address 172.16.98.10 255.255.255.0
+ ipv6 address FE80::24 link-local
+ ipv6 address 200A:A:2:98::10/64
+!
+ip default-gateway 172.16.98.1
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+!
+!
+control-plane
+!
+banner motd SW10
+!
+line con 0
+ exec-timeout 15 0
+ password 7 030752180500
+ logging synchronous
+ login
+line aux 0
+line vty 0 4
+ exec-timeout 15 0
+ password 7 00161C0910
+ logging synchronous
+ login
+ transport input ssh
+!
+!
+end

@@ -1,0 +1,165 @@
+
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname R16
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 5 $1$I6u7$9h0e3wabCQ2eAu9HIquHj0
+!
+no aaa new-model
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+ipv6 unicast-routing
+ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback16
+ no shutdown
+ ip address 10.255.3.3 255.255.255.255
+ ipv6 address 200A:A:2:FFFF::16/128
+!
+interface Ethernet0/0
+ no shutdown
+ description "R16 to SW10"
+ no ip address
+!
+interface Ethernet0/0.9
+ no shutdown
+ description "VLAN9 OFFICE9"
+ encapsulation dot1Q 9
+ ip address 172.16.9.3 255.255.255.0
+ standby version 2
+ standby 9 ip 172.16.9.1
+ standby 9 priority 120
+ standby 9 preempt delay minimum 30
+ standby 109 ipv6 FE80::9
+ standby 109 priority 120
+ standby 109 preempt delay minimum 30
+ ipv6 address FE80::11 link-local
+ ipv6 address 200A:A:2:9::3/64
+!
+interface Ethernet0/1
+ no shutdown
+ description "R16 to R18"
+ ip address 10.10.11.2 255.255.255.252
+ ipv6 address FE80::11 link-local
+ ipv6 address 200A:A:2:1::2/64
+ ipv6 enable
+!
+interface Ethernet0/2
+ no shutdown
+ description "R16 to SW9"
+ no ip address
+!
+interface Ethernet0/2.8
+ no shutdown
+ description "VLAN8 OFFICE8"
+ encapsulation dot1Q 8
+ ip address 172.16.8.3 255.255.255.0
+ standby version 2
+ standby 8 ip 172.16.8.1
+ standby 8 preempt delay minimum 30
+ standby 108 ipv6 FE80::8
+ standby 108 preempt delay minimum 30
+ ipv6 address FE80::11 link-local
+ ipv6 address 200A:A:2:8::3/64
+!
+interface Ethernet0/2.98
+ no shutdown
+ description "VLAN98 MANAGEMENT"
+ encapsulation dot1Q 98
+ ip address 172.16.98.3 255.255.255.0
+ standby version 2
+ standby 98 ip 172.16.98.1
+ standby 98 preempt delay minimum 30
+ standby 198 ipv6 FE80::98
+ standby 198 preempt delay minimum 30
+ ipv6 address FE80::11 link-local
+ ipv6 address 200A:A:2:98::3/64
+!
+interface Ethernet0/3
+ no shutdown
+ description "R16 to R32"
+ ip address 10.10.11.9 255.255.255.252
+ ipv6 address FE80::11 link-local
+ ipv6 address 200A:A:2:3::1/64
+ ipv6 enable
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+banner motd R16
+!
+line con 0
+ exec-timeout 15 0
+ password 7 01100F175804
+ logging synchronous
+ login
+line aux 0
+line vty 0 4
+ exec-timeout 15 0
+ password 7 0316540412
+ logging synchronous
+ login
+ transport input ssh
+!
+!
+end

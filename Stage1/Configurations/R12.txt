@@ -1,0 +1,188 @@
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname R12
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 5 $1$uvbg$3q9/WksdksCPigabc6Puh.
+!
+no aaa new-model
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+ipv6 unicast-routing
+ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback12
+ no shutdown
+ description "Management Interface"
+ ip address 10.255.4.5 255.255.255.255
+ ipv6 address 200A:A:1:FFFF::12/128
+!
+interface Ethernet0/0
+ no shutdown
+ description "TRUNK TO SW4"
+ no ip address
+!
+interface Ethernet0/0.11
+ no shutdown
+ description "VLAN11 OFFICE"
+ encapsulation dot1Q 11
+ ip address 172.16.11.2 255.255.255.0
+ standby version 2
+ standby 11 ip 172.16.11.1
+ standby 11 priority 120
+ standby 11 preempt delay minimum 30
+ standby 111 ipv6 FE80::11
+ standby 111 priority 120
+ standby 111 preempt delay minimum 30
+ ipv6 address FE80::17 link-local
+ ipv6 address 200A:A:1:11::2/64
+ ipv6 enable
+!
+interface Ethernet0/0.99
+ no shutdown
+ description "VLAN99 MANAGEMENT"
+ encapsulation dot1Q 99
+ ip address 172.16.99.2 255.255.255.0
+ standby version 2
+ standby 99 ip 172.16.99.1
+ standby 99 priority 120
+ standby 99 preempt delay minimum 30
+ standby 199 ipv6 FE80::99
+ standby 199 priority 120
+ standby 199 preempt delay minimum 30
+ ipv6 address FE80::17 link-local
+ ipv6 address 200A:A:1:99::2/64
+!
+interface Ethernet0/1
+ no shutdown
+ description "TRUNK TO SW5"
+ no ip address
+!
+interface Ethernet0/1.10
+ no shutdown
+ description "VLAN10 OFFICE"
+ encapsulation dot1Q 10
+ ip address 172.16.10.3 255.255.255.0
+ standby version 2
+ standby 10 ip 172.16.10.1
+ standby 10 preempt delay minimum 30
+ standby 110 ipv6 FE80::10
+ standby 110 preempt delay minimum 30
+ ipv6 address FE80::17 link-local
+ ipv6 address 200A:A:1:10::3/64
+!
+interface Ethernet0/2
+ no shutdown
+ description "R12 to R14"
+ ip address 10.10.12.2 255.255.255.252
+ ipv6 address FE80::17 link-local
+ ipv6 address 200A:A:1:1::2/64
+ ipv6 enable
+!
+interface Ethernet0/3
+ no shutdown
+ description "R12 to R15"
+ ip address 10.10.12.18 255.255.255.252
+ ipv6 address FE80::17 link-local
+ ipv6 address 200A:A:1:5::2/64
+ ipv6 enable
+!
+interface Ethernet1/0
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet1/1
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet1/2
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet1/3
+ no shutdown
+ no ip address
+ shutdown
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+banner motd R12
+!
+line con 0
+ exec-timeout 15 0
+ password 7 14141B180F0B
+ logging synchronous
+ login
+line aux 0
+line vty 0 4
+ exec-timeout 15 0
+ password 7 00161C0910
+ logging synchronous
+ login
+ transport input ssh
+!
+!
+end
