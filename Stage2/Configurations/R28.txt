@@ -1,0 +1,213 @@
+
+!
+! Last configuration change at 02:17:34 UTC Tue Nov 17 2026
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname R28
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 5 $1$Pj1/$o6hhzXXk/mpzQx9SZrpER/
+!
+no aaa new-model
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+ipv6 unicast-routing
+ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+!
+track 725 ip sla 725 reachability
+ delay down 3 up 10
+!
+track 726 ip sla 726 reachability
+ delay down 3 up 10
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback28
+ no shutdown
+ description "MANAGEMENT LOOPBACK"
+ ip address 10.255.2.2 255.255.255.255
+ ipv6 address 200A:A:3:FFFF::28/128
+!
+interface Ethernet0/0
+ no shutdown
+ description "R28 to R26"
+ ip address 133.133.133.14 255.255.255.252
+ ipv6 address FE80::8 link-local
+ ipv6 address 2003:3:3:4::2/64
+ ipv6 enable
+!
+interface Ethernet0/1
+ no shutdown
+ description "R28 to R29"
+ ip address 133.133.133.10 255.255.255.252
+ ipv6 address FE80::8 link-local
+ ipv6 address 2003:3:3:3::2/64
+ ipv6 enable
+!
+interface Ethernet0/2
+ no shutdown
+ description "TRUNK to SW29"
+ no ip address
+!
+interface Ethernet0/2.7
+ no shutdown
+ description "R28 to SW29"
+ encapsulation dot1Q 7
+ ip address 172.16.7.1 255.255.255.0
+ ip policy route-map CHOK-PBR
+ ipv6 address FE80::8 link-local
+ ipv6 address 200A:A:3:7::1/64
+!
+interface Ethernet0/2.97
+ no shutdown
+ description "R28 to SW29"
+ encapsulation dot1Q 97
+ ip address 172.16.97.1 255.255.255.0
+ ipv6 address FE80::8 link-local
+ ipv6 address 200A:A:3:97::1/64
+!
+interface Ethernet0/3
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet1/0
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet1/1
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet1/2
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet1/3
+ no shutdown
+ no ip address
+ shutdown
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+ip route 0.0.0.0 0.0.0.0 133.133.133.9 track 725
+ip route 0.0.0.0 0.0.0.0 133.133.133.13 track 726
+!
+ip access-list extended CHOK-PBR-BYPASS
+ permit ip 172.16.7.0 0.0.0.255 172.16.7.0 0.0.0.255
+ permit ip 172.16.7.0 0.0.0.255 172.16.97.0 0.0.0.255
+ permit ip 172.16.7.0 0.0.0.255 host 10.255.2.1
+ permit ip 172.16.7.0 0.0.0.255 133.133.133.8 0.0.0.3
+ permit ip 172.16.7.0 0.0.0.255 133.133.133.12 0.0.0.3
+ip access-list extended CHOK-PC30
+ permit ip host 172.16.7.10 any
+ip access-list extended CHOK-PC31
+ permit ip host 172.16.7.11 any
+!
+ip sla auto discovery
+ip sla 725
+ icmp-echo 133.133.133.9 source-interface Ethernet0/1
+ threshold 500
+ timeout 1000
+ frequency 5
+ip sla schedule 725 life forever start-time now
+ip sla 726
+ icmp-echo 133.133.133.13 source-interface Ethernet0/0
+ threshold 500
+ timeout 1000
+ frequency 5
+ip sla schedule 726 life forever start-time now
+ipv6 route ::/0 2003:3:3:3::1
+ipv6 route ::/0 2003:3:3:4::1
+!
+route-map CHOK-PBR6 permit 10
+ match ipv6 address CHOK-PC30-V6
+!
+route-map CHOK-PBR deny 5
+ match ip address CHOK-PBR-BYPASS
+!
+route-map CHOK-PBR permit 10
+ match ip address CHOK-PC30
+ set ip next-hop verify-availability 133.133.133.9 10 track 725
+ set ip next-hop verify-availability 133.133.133.13 20 track 726
+!
+route-map CHOK-PBR permit 20
+ match ip address CHOK-PC31
+ set ip next-hop verify-availability 133.133.133.13 10 track 726
+ set ip next-hop verify-availability 133.133.133.9 20 track 725
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+banner motd R28
+!
+line con 0
+ exec-timeout 15 0
+ password 7 1511021F0725
+ logging synchronous
+ login
+line aux 0
+line vty 0 4
+ exec-timeout 15 0
+ password 7 111B160A03
+ logging synchronous
+ login
+ transport input ssh
+!
+!
+end
