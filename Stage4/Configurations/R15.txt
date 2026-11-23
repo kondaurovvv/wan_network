@@ -1,0 +1,189 @@
+
+!
+! Last configuration change at 07:07:07 UTC Mon Nov 23 2026
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname R15
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 5 $1$I4D2$yuEOEftVe.XjSw0Dw1h7f1
+!
+no aaa new-model
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+ipv6 unicast-routing
+ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback15
+ no shutdown
+ description "Management Interface"
+ ip address 10.255.4.2 255.255.255.255
+ ip ospf 1 area 0
+ ipv6 address 200A:A:1:FFFF::15/128
+ ipv6 ospf 1 area 0
+!
+interface Ethernet0/0
+ no shutdown
+ description "R15 to R13"
+ ip address 10.10.12.13 255.255.255.252
+ ip ospf 1 area 10
+ ipv6 address FE80::14 link-local
+ ipv6 address 200A:A:1:4::1/64
+ ipv6 enable
+ ipv6 ospf 1 area 10
+!
+interface Ethernet0/1
+ no shutdown
+ description "R15 to R12"
+ ip address 10.10.12.17 255.255.255.252
+ ip ospf 1 area 10
+ ipv6 address FE80::14 link-local
+ ipv6 address 200A:A:1:5::1/64
+ ipv6 enable
+ ipv6 ospf 1 area 10
+!
+interface Ethernet0/2
+ no shutdown
+ description "R15 to R21"
+ ip address 122.122.122.2 255.255.255.252
+ ipv6 address FE80::14 link-local
+ ipv6 address 2002:2:2:1::2/64
+ ipv6 enable
+!
+interface Ethernet0/3
+ no shutdown
+ description "R15 to R20"
+ ip address 10.10.12.21 255.255.255.252
+ ip ospf 1 area 102
+ ipv6 address FE80::14 link-local
+ ipv6 address 200A:A:1:6::1/64
+ ipv6 enable
+ ipv6 ospf 1 area 102
+!
+interface Ethernet1/0
+ no shutdown
+ description "OSPF BACKBONE TO R14"
+ ip address 10.10.12.26 255.255.255.252
+ ip ospf network point-to-point
+ ip ospf 1 area 0
+ ipv6 address FE80::14 link-local
+ ipv6 address 200A:A:1:7::2/64
+ ipv6 ospf 1 area 0
+ ipv6 ospf network point-to-point
+!
+interface Ethernet1/1
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet1/2
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet1/3
+ no shutdown
+ no ip address
+ shutdown
+!
+router ospf 1
+ router-id 10.255.4.2
+ area 10 stub
+ area 102 filter-list prefix AREA102-IN in
+ passive-interface default
+ no passive-interface Ethernet0/0
+ no passive-interface Ethernet0/1
+ no passive-interface Ethernet0/3
+ no passive-interface Ethernet1/0
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+ip prefix-list AREA102-IN seq 10 deny 10.10.12.8/30
+ip prefix-list AREA102-IN seq 20 deny 10.255.4.3/32
+ip prefix-list AREA102-IN seq 100 permit 0.0.0.0/0 le 32
+ipv6 router ospf 1
+ router-id 10.255.4.2
+ area 10 stub
+ passive-interface default
+ no passive-interface Ethernet0/0
+ no passive-interface Ethernet0/1
+ no passive-interface Ethernet0/3
+ no passive-interface Ethernet1/0
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+banner motd R15
+!
+line con 0
+ exec-timeout 15 0
+ password 7 00071A150754
+ logging synchronous
+ login
+line aux 0
+line vty 0 4
+ exec-timeout 15 0
+ password 7 0101090B4F
+ logging synchronous
+ login
+ transport input ssh
+!
+!
+end
